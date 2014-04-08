@@ -41,7 +41,7 @@ Vagrant.configure("2") do |config|
     aws.ami = "ami-59a4a230"  # ubuntu 12.04.3 LTS 64 bits
 
     aws.tags = {
-      "name" => "daniel dev box",
+      "Name" => "daniel dev box",
     }
   end
 end
