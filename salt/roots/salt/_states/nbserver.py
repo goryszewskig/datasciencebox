@@ -23,7 +23,7 @@ def running(name, directory, env=None, ip='0.0.0.0', port=8888, force=False, std
             __salt__['cmd.run_all'](cmd, runas=user)
             cmd = 'rm %s' % name
             __salt__['cmd.run_all'](cmd, runas=user)
-            ans['changes']['old'] = 'Killed process (%s)' % pid
+            ans['changes']['old'] = 'Killed process %s' % pid
         else:
             ans['comment'] = 'Agent is already running with pid: %s' % pid
             return ans

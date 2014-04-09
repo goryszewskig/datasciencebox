@@ -1,5 +1,8 @@
 base:
   '*':
+    - base
     - users
-    - pythonenv
+    - python
+    - ipythonnb
+    - luigi
     - s3cmd
