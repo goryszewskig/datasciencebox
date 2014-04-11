@@ -35,9 +35,8 @@ def running(name, directory, env=None, ip='0.0.0.0', port=8888, force=False, std
         ipython = os.path.join(env, 'bin', 'ipython')
     cmd = '{ipython} notebook --ip={ip} --port={port} --no-browser >> {stdout} 2>> {stderr} &'
     cmd = cmd.format(ipython=ipython, ip=ip, port=port, stdout=stdout, stderr=stderr)
-    print '!!!!!!', cmd
     dic = __salt__['cmd.run_all'](cmd, cwd=directory, runas=user)
-    pid = dic['pid']
+    pid = dic['pid'] + 1
 
     # write pid filei
     cmd = "echo {pid} > {pidfile}".format(pid=pid, pidfile=name)
