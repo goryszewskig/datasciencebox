@@ -3,7 +3,7 @@ include:
 
 anaconda:
   cmd.run:
-    - name: "wget http://repo.continuum.io/miniconda/Miniconda3-3.3.0-Linux-x86_64.sh -q -O miniconda.sh && bash miniconda.sh -b -p /home/ubuntu/anaconda && rm miniconda.sh"
+    - name: "wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -q -O miniconda.sh && bash miniconda.sh -b -p /home/ubuntu/anaconda && rm miniconda.sh"
     - cwd: /home/ubuntu
     - user: ubuntu
     - onlyif: "test ! -d /home/ubuntu/anaconda"
