@@ -23,6 +23,8 @@ oh-my-zsh:
     - name: git://github.com/robbyrussell/oh-my-zsh.git
     - target: /home/ubuntu/.oh-my-zsh
     - user: ubuntu
+    - require:
+      - pkg: pkgs
 
 dot_zshrc:
   file.copy:
