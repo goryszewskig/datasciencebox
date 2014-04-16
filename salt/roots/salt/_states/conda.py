@@ -6,22 +6,24 @@ def execcmd(cmd, user=None):
     return __salt__['cmd.run_all'](' '.join(cmd), runas=user)
 
 
-def managed(name, env=None, conda=None, packages=None, requirements=None, pip=None, user=None):
+def managed(name, env=None, packages=None, requirements=None, conda=None, pip=None, user=None):
     """
     Create and install python requirements in a conda enviroment
     pip is isntalled by default in the new enviroment
 
-    env
-        env or path where to put the new enviroment
-    conda : None
-        Location for the `conda` command
-        if None it is asumed the `conda` command is in the PATH
+    env : None
+        environment name or path where to put the new enviroment
+        if None (default) will use the default conda environment (`~/anaconda/bin`)
     packages : None
         single packge or list of packages to install i.e. numpy, scipy=0.13.3, pandas
     requirements : None
         path to a `requirements.txt` file in the `pip freeze` format
+    conda : None
+        Location for the `conda` command
+        if None it is asumed the `conda` cmd is in the PATH
     pip : None
         location of the `pip` cmd to default libraries not in the conda repo
+        if None (default) it is asumed the `pip` cmd is in the PAT
     user
         The user under which to run the commands
     """
@@ -56,14 +58,14 @@ def managed(name, env=None, conda=None, packages=None, requirements=None, pip=No
                 return ans
 
     if packages is not None:
-        installation_ans = installed(packages, env, conda=conda, user=user, pip=pip)
+        installation_ans = installed(packages, env, conda=conda, pip=pip, user=user)
         ans['result'] = ans['result'] and installation_ans['result']
         comment = 'From list [%s]' % installation_ans['comment']
         ans['comment'] = ans['comment'] + ' - ' + comment
         ans['changes'].update(installation_ans['changes'])
 
     if requirements is not None:
-        installation_ans = installed(requirements, env, conda=conda, user=user, pip=pip)
+        installation_ans = installed(requirements, env, conda=conda, pip=pip, user=user)
         ans['result'] = ans['result'] and installation_ans['result']
         comment = 'From file [%s]' % installation_ans['comment']
         ans['comment'] = ans['comment'] + ' - ' + comment
@@ -115,7 +117,7 @@ def installed(name, env=None, conda=None, pip=None, user=None):
     failed = 0
     old = 0
     for i, package in enumerate(packages):
-        ret = install(package, env, conda, pip=pip, user=user)
+        ret = install(package, env=env, conda=conda, pip=pip, user=user)
         if ret == 'OK':
             ans['changes'][package] = 'installed'
             installed = installed + 1
