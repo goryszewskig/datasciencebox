@@ -6,19 +6,12 @@ Vagrant.configure("2") do |config|
   config.vm.network "forwarded_port", guest: 8888, host: 8888
 
   # For salt masterless, mount your file roots file root
-  config.vm.synced_folder "salt/roots/", "/srv"
+  config.vm.synced_folder "salt/", "/srv"
 
   config.vm.provision :salt do |salt|
     salt.minion_config = "salt/minion"
     salt.run_highstate = true
     salt.verbose = true
-
-    salt.pillar({
-      "aws" => {
-        "access_key" => "",
-        "secret_key" => ""
-      }
-    })
   end
 
   config.vm.provider :aws do |aws, override|
@@ -41,7 +34,7 @@ Vagrant.configure("2") do |config|
     aws.ami = "ami-59a4a230"  # ubuntu 12.04.3 LTS 64 bits
 
     aws.tags = {
-      "Name" => "daniel dev box",
+      "Name" => "datasciencebox",
     }
   end
 end
