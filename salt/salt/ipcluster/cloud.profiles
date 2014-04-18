@@ -1,0 +1,5 @@
+base_ec2:
+  provider: ec2-private-ips
+  image: ami-59a4a230
+  size: m1.large
+  ssh_username: ubuntu

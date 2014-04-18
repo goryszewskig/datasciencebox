@@ -7,7 +7,7 @@ luigi:
     - pip: /home/ubuntu/anaconda/bin/pip
     - user: ubuntu
     - require:
-      - cmd: anaconda
+      - conda: base
 
 /etc/luigi/client.cfg:
   file.managed:

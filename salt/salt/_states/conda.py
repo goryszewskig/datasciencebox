@@ -31,6 +31,7 @@ def managed(name, env=None, packages=None, requirements=None, conda=None, pip=No
     ans['name'] = name
     ans['changes'] = {}
     ans['comment'] = ''
+    comments = []
     ans['result'] = True
 
     if conda is None:
@@ -46,11 +47,11 @@ def managed(name, env=None, packages=None, requirements=None, conda=None, pip=No
 
         ret = execcmd(cmd, user)
         if ret['retcode'] == 0:
-            ans['comment'] = 'Virtual enviroment [%s] created' % env
+            comments.append('Virtual enviroment [%s] created' % env)
             ans['changes'][env] = 'Virtual enviroment created'
         else:
             if ret['stderr'].startswith('Error: prefix already exists:'):
-                ans['comment'] = 'Virtual enviroment [%s] already exists' % env
+                comments.append('Virtual enviroment [%s] already exists' % env)
             else:
                 # Another error
                 ans['comment'] = ret['stderr']
@@ -60,17 +61,16 @@ def managed(name, env=None, packages=None, requirements=None, conda=None, pip=No
     if packages is not None:
         installation_ans = installed(packages, env, conda=conda, pip=pip, user=user)
         ans['result'] = ans['result'] and installation_ans['result']
-        comment = 'From list [%s]' % installation_ans['comment']
-        ans['comment'] = ans['comment'] + ' - ' + comment
+        comments.append('From list [%s]' % installation_ans['comment'])
         ans['changes'].update(installation_ans['changes'])
 
     if requirements is not None:
         installation_ans = installed(requirements, env, conda=conda, pip=pip, user=user)
         ans['result'] = ans['result'] and installation_ans['result']
-        comment = 'From file [%s]' % installation_ans['comment']
-        ans['comment'] = ans['comment'] + ' - ' + comment
+        comments.append('From file [%s]' % installation_ans['comment'])
         ans['changes'].update(installation_ans['changes'])
 
+    ans['comment'] = ' - '.join(comments)
     return ans
 
 
@@ -96,16 +96,22 @@ def installed(name, env=None, conda=None, pip=None, user=None):
         conda = 'conda'
 
     packages = []
-    if os.path.exists(name):
-        # Check if pkgs is a file
-        with open(name, mode='r') as f:
-            for package in f:
-                package = package.strip()
-                if package == '' or package.startswith('#'):
-                    # Empty line or comment, go to next line
-                    continue
-                else:
-                    packages.append(package)
+    if os.path.exists(name) or name.startswith('salt://'):
+        if name.startswith('salt://'):
+            lines = __salt__['cp.get_file_str'](name)
+            lines = lines.split('\n')
+        elif os.path.exists(name):
+            # name is a file
+            lines = open(name, mode='r').readlines()
+
+        for line in lines:
+            # TODO: remove inline comments, so they are possible
+            line = line.strip()
+            if line == '' or line.startswith('#'):
+                # Empty line or comment, go to next line
+                continue
+            else:
+                packages.append(line)
     else:
         # Is not a file is a single package or list of packages
         temp = name.split(',')
@@ -127,7 +133,7 @@ def installed(name, env=None, conda=None, pip=None, user=None):
             failed = failed + 1
 
     comment = '{0} packages installed, {1} already in installed, {2} failed'
-    ans['comment'] = comment.format(installed, failed, old)
+    ans['comment'] = comment.format(installed, old, failed)
 
     if failed != 0:
         ans['result'] = False
@@ -170,12 +176,12 @@ def install(package, env=None, conda=None, pip=None, user=None):
         ret = execcmd(cmd, user)
 
         if ret['retcode'] == 0:
-            if ret['stdout'].startswith('# All requested packages already installed'):
+            if '# All requested packages already installed' in ret['stdout']:
                 return 'OLD'
             else:
                 return 'OK'
         else:
-            if ret['stderr'].startswith('Error: No packages found matching:'):
+            if 'Error: No packages found matching:' in ret['stderr']:
                 # Package not in conda try pypi
                 cmd = pip_base_cmd + [package]
                 ret = execcmd(cmd, user)
