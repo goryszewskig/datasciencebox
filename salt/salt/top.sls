@@ -1,7 +1,7 @@
 base:
   '*':
-    # - base
-    # - users
+    - base
+    - users
     - python
     - ipnotebook
-    # - s3cmd
+    - s3cmd
