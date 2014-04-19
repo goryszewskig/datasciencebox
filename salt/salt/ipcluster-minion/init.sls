@@ -20,7 +20,7 @@ pyzmq:
 
 ipengine:
   background.running:
-    - name: "/usr/bin/mpiexec -n 2 /home/ubuntu/anaconda/bin/ipengine"
+    - name: "/usr/bin/mpiexec -n {{ pillar['ipcluster']['nengines'] }} /home/ubuntu/anaconda/bin/ipengine"
     - pid: /home/ubuntu/run/ipengine.pid
     - stdout: /home/ubuntu/log/ipengine.out
     - stderr: /home/ubuntu/log/ipengine.err
