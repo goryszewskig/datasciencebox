@@ -8,13 +8,9 @@ ec2-private-ips:
 
   # Set up the location of the salt master
   minion:
-    master: {{ pillar['ipcluster']['master'] }}
+    master: {{ grains['fqdn_ip4'][0] }}
 
-  # Specify whether to use public or private IP for deploy script.
-  #
-  # Valid options are:
-  #     private_ips - The salt-master is also hosted with EC2
-  #     public_ips - The salt-master is hosted outside of EC2
+  # private_ips: The salt-master is also hosted with EC2
   ssh_interface: private_ips
 
   # Set the EC2 access credentials (see below)
@@ -27,5 +23,5 @@ ec2-private-ips:
   securitygroup: {{ pillar['ipcluster']['securitygroup'] }}
 
   # Optionally configure default region
-  location: us-east-1
-  availability_zone: us-east-1d
+  location: {{ pillar['ipcluster']['location'] }}
+  availability_zone: {{ pillar['ipcluster']['availability_zone'] }}
